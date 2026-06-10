@@ -1,0 +1,40 @@
+Create supabase clint for a next.js 15 app router project using typescript and @supabase/supabase-js.
+
+create a file lib/supabase.ts
+
+requrimet is 
+1 use NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY
+2 export a resuable supabase clint 
+3 typescript 
+4 follow current supabase best practies
+
+---
+
+create test page at app/test/page.txs
+
+requriment is:
+
+1 import the supabase client from lib/supabase.ts
+
+2 query a simple table name profile
+
+3 display "Supabase Connected " if request succeseds error message if request fails 
+
+4 use async server comoponet 
+
+5 type script
+
+---
+
+create a signup page for next.js 15 app router application
+
+requriments is 
+
+1 route: app/signup/page.tsx
+2 email input
+3 password input
+4 submit button
+5 use supabase auth signUp()
+6 show success or error message
+7 typescript
+8 use minimul styling

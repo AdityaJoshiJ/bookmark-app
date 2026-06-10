@@ -1,0 +1,22 @@
+{
+  "cli_version": "0.7.5",
+  "checkpoint_id": "da661ec5ec85",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "app/signup/page.tsx",
+    "app/test/page.tsx",
+    "lib/supabase.ts",
+    "package-lock.json",
+    "package.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/da/661ec5ec85/0/metadata.json",
+      "transcript": "/da/661ec5ec85/0/full.jsonl",
+      "content_hash": "/da/661ec5ec85/0/content_hash.txt",
+      "prompt": "/da/661ec5ec85/0/prompt.txt"
+    }
+  ]
+}
