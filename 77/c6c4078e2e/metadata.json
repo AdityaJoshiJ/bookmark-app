@@ -1,0 +1,18 @@
+{
+  "cli_version": "0.7.5",
+  "checkpoint_id": "77c6c4078e2e",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "hello.js"
+  ],
+  "sessions": [
+    {
+      "metadata": "/77/c6c4078e2e/0/metadata.json",
+      "transcript": "/77/c6c4078e2e/0/full.jsonl",
+      "content_hash": "/77/c6c4078e2e/0/content_hash.txt",
+      "prompt": "/77/c6c4078e2e/0/prompt.txt"
+    }
+  ]
+}
