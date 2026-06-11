@@ -1,0 +1,28 @@
+create login page for next.js 15 app router 
+
+requirements is 
+
+1 route: app/login/page.tsx
+2 email input
+3 password input
+4 use supabase.auth.signInWithPassword
+5 show erros
+6 redirect to /deshboard on success
+7 typescript
+8 use minimal styling
+
+---
+
+create bookmark form component
+
+fields
+1 title
+2 url
+3 in_public(checkbox)
+
+requirment is 
+
+1 typescript
+2 tailwind
+3 submit handler placeholder
+4 resuable component
