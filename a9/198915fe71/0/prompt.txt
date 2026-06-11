@@ -1,0 +1,10 @@
+add delete bookmark functionality
+
+requriments is 
+
+1 add delete button for each bookmark
+2 delete form bookmarks table
+3 only delete current user's bookmark
+4 refrsh list after delete
+5 show success/error message
+6 typescript
