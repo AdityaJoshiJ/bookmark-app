@@ -1,0 +1,56 @@
+{
+  "cli_version": "0.7.5",
+  "checkpoint_id": "78ce7cba2dae",
+  "session_id": "65f41c6a-f86e-4008-89ac-116d720a7809",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-11T21:20:19.742336Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "app/dashboard/page.tsx"
+  ],
+  "agent": "Gemini CLI",
+  "model": "gemini-3-flash-preview",
+  "turn_id": "f41a24800567",
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-11T21:20:19.729184Z",
+    "agent_lines": 114,
+    "agent_removed": 8,
+    "human_added": 0,
+    "human_modified": 1,
+    "human_removed": 19,
+    "total_committed": 114,
+    "total_lines_changed": 142,
+    "agent_percentage": 85.91549295774648,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 214,
+      "user_lines_removed": 23,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".gemini/agents/entire-search.md": 28,
+        ".gemini/settings.json": 141,
+        "app/dashboard/page.tsx": 29,
+        "components/BookmarkForm.tsx": 16
+      },
+      "user_removed_per_file": {
+        "app/dashboard/page.tsx": 19,
+        "components/BookmarkForm.tsx": 4
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 214,
+      "agent_lines_removed": 23
+    }
+  ]
+}

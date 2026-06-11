@@ -1,0 +1,28 @@
+implement handle management
+
+current setup is
+profiles table exists
+columns: id, email, handle, create_at
+authentication already works
+
+requirement is 
+1 show current handle on dashbord
+2 allow user to create or update handle
+3 save handle to profiles table
+4 handle msut be unique
+5 show validation error if handle already exists
+6 Load existing handle when dashboard opens
+7 typescript 
+8 explain implementation plan before making changes
+
+---
+
+plan apporoved with there changes
+
+1 veriflt profiles.handle has a unique database constrain before implementation
+2 use update() instead of upsert() because profile rows already exist
+3 validate handles : lowercase letters, number, underscore, length 3-20 
+4 keep email visible on dashboard while showing handle
+5 explain any requried SQL chnages before editing code
+
+proceed with impolementation
