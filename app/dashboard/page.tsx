@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [fetchingBookmarks, setFetchingBookmarks] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -103,6 +104,41 @@ export default function DashboardPage() {
     }
   };
 
+  const handleDeleteBookmark = async (id: string) => {
+    if (!user) return;
+    
+    if (!confirm("Are you sure you want to delete this bookmark?")) return;
+
+    setDeletingId(id);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase
+        .from("bookmarks")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      setMessage({
+        type: "success",
+        text: "Bookmark deleted successfully!",
+      });
+      
+      fetchBookmarks(user.id);
+    } catch (err) {
+      console.error("Error deleting bookmark:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to delete bookmark";
+      setMessage({
+        type: "error",
+        text: errorMessage,
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -164,9 +200,9 @@ export default function DashboardPage() {
                 {bookmarks.map((bookmark) => (
                   <div
                     key={bookmark.id}
-                    className="p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-all flex justify-between items-start"
+                    className="p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-all flex justify-between items-start group"
                   >
-                    <div className="overflow-hidden">
+                    <div className="overflow-hidden flex-1 mr-4">
                       <h3 className="font-semibold text-gray-900 truncate">
                         {bookmark.title}
                       </h3>
@@ -179,15 +215,42 @@ export default function DashboardPage() {
                         {bookmark.url}
                       </a>
                     </div>
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        bookmark.is_public
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {bookmark.is_public ? "Public" : "Private"}
-                    </span>
+                    <div className="flex items-center space-x-3 shrink-0">
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          bookmark.is_public
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {bookmark.is_public ? "Public" : "Private"}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteBookmark(bookmark.id)}
+                        disabled={deletingId === bookmark.id}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors disabled:opacity-50"
+                        title="Delete bookmark"
+                      >
+                        {deletingId === bookmark.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
