@@ -14,20 +14,48 @@ interface Bookmark {
   created_at: string;
 }
 
+interface Profile {
+  handle: string | null;
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [fetchingBookmarks, setFetchingBookmarks] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
+  
+  // Handle state
+  const [isEditingHandle, setIsEditingHandle] = useState(false);
+  const [newHandle, setNewHandle] = useState("");
+  const [handleLoading, setHandleLoading] = useState(false);
+  const [handleError, setHandleError] = useState<string | null>(null);
+
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
   } | null>(null);
-  const [formKey, setFormKey] = useState(0);
+  const [, setFormKey] = useState(0);
   const router = useRouter();
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("handle")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      setProfile(data);
+      if (data?.handle) setNewHandle(data.handle);
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    }
+  }, []);
 
   const fetchBookmarks = useCallback(async (userId: string) => {
     setFetchingBookmarks(true);
@@ -49,33 +77,86 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         router.push("/login");
       } else {
         setUser(user);
-        fetchBookmarks(user.id);
+        await Promise.all([
+          fetchProfile(user.id),
+          fetchBookmarks(user.id)
+        ]);
       }
       setLoading(false);
     };
 
     checkUser();
-  }, [router, fetchBookmarks]);
+  }, [router, fetchBookmarks, fetchProfile]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push("/login");
   };
 
-  const handleBookmarkSubmit = async (data: { title: string; url: string; is_public: boolean }) => {
+  const validateHandle = (handle: string) => {
+    if (handle.length < 3 || handle.length > 20) {
+      return "Handle must be between 3 and 20 characters";
+    }
+    if (!/^[a-z0-9_]+$/.test(handle)) {
+      return "Handle can only contain lowercase letters, numbers, and underscores";
+    }
+    return null;
+  };
+
+  const handleSaveHandle = async () => {
     if (!user) return;
     
+    const error = validateHandle(newHandle);
+    if (error) {
+      setHandleError(error);
+      return;
+    }
+
+    setHandleLoading(true);
+    setHandleError(null);
+
+    try {
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ handle: newHandle })
+        .eq("id", user.id);
+
+      if (updateError) {
+        if (updateError.code === "23505") {
+          throw new Error("This handle is already taken");
+        }
+        throw updateError;
+      }
+
+      setProfile({ handle: newHandle });
+      setIsEditingHandle(false);
+      setMessage({ type: "success", text: "Handle updated successfully!" });
+    } catch (err) {
+      setHandleError(err instanceof Error ? err.message : "Failed to update handle");
+    } finally {
+      setHandleLoading(false);
+    }
+  };
+
+  const handleBookmarkSubmit = async (data: {
+    title: string;
+    url: string;
+    is_public: boolean;
+  }) => {
+    if (!user) return;
+
     setSubmitting(true);
     setMessage(null);
 
     try {
       if (editingBookmark) {
-        // Update existing bookmark
         const { error } = await supabase
           .from("bookmarks")
           .update({
@@ -93,7 +174,6 @@ export default function DashboardPage() {
           text: "Bookmark updated successfully!",
         });
       } else {
-        // Create new bookmark
         const { error } = await supabase.from("bookmarks").insert({
           user_id: user.id,
           title: data.title,
@@ -108,14 +188,14 @@ export default function DashboardPage() {
           text: "Bookmark added successfully!",
         });
       }
-      
-      // Reset form state
+
       setEditingBookmark(null);
-      setFormKey(prev => prev + 1);
+      setFormKey((prev) => prev + 1);
       fetchBookmarks(user.id);
     } catch (err) {
-      console.error("Error adding bookmark:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to add bookmark";
+      console.error("Error saving bookmark:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to save bookmark";
       setMessage({
         type: "error",
         text: errorMessage,
@@ -127,18 +207,17 @@ export default function DashboardPage() {
 
   const handleEditClick = (bookmark: Bookmark) => {
     setEditingBookmark(bookmark);
-    setFormKey(prev => prev + 1); // Reset form with new initial data
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setFormKey((prev) => prev + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCancelEdit = () => {
     setEditingBookmark(null);
-    setFormKey(prev => prev + 1);
+    setFormKey((prev) => prev + 1);
   };
 
   const handleDeleteBookmark = async (id: string) => {
     if (!user) return;
-    
     if (!confirm("Are you sure you want to delete this bookmark?")) return;
 
     setDeletingId(id);
@@ -157,8 +236,7 @@ export default function DashboardPage() {
         type: "success",
         text: "Bookmark deleted successfully!",
       });
-      
-      // If we're currently editing this bookmark, cancel it
+
       if (editingBookmark?.id === id) {
         handleCancelEdit();
       }
@@ -166,7 +244,8 @@ export default function DashboardPage() {
       fetchBookmarks(user.id);
     } catch (err) {
       console.error("Error deleting bookmark:", err);
-      const errorMessage = err instanceof Error ? err.message : "Failed to delete bookmark";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete bookmark";
       setMessage({
         type: "error",
         text: errorMessage,
@@ -186,10 +265,64 @@ export default function DashboardPage() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 text-sm">Welcome back, {user?.email}</p>
+          <div className="flex flex-col mt-1">
+            <div className="flex items-center space-x-2">
+              {isEditingHandle ? (
+                <div className="flex flex-col">
+                  <div className="flex items-center space-x-2">
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">@</span>
+                      <input
+                        type="text"
+                        value={newHandle}
+                        onChange={(e) => setNewHandle(e.target.value.toLowerCase())}
+                        placeholder="handle"
+                        className="pl-7 pr-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none w-48"
+                        autoFocus
+                      />
+                    </div>
+                    <button
+                      onClick={handleSaveHandle}
+                      disabled={handleLoading}
+                      className="px-3 py-1 text-xs font-semibold text-white bg-black rounded-lg hover:bg-gray-800 disabled:bg-gray-400"
+                    >
+                      {handleLoading ? "..." : "Save"}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsEditingHandle(false);
+                        setNewHandle(profile?.handle || "");
+                        setHandleError(null);
+                      }}
+                      className="px-3 py-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {handleError && <p className="mt-1 text-xs text-red-600">{handleError}</p>}
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <p className="text-gray-900 font-medium">
+                    {profile?.handle ? `@${profile.handle}` : "No handle set"}
+                  </p>
+                  <button
+                    onClick={() => setIsEditingHandle(true)}
+                    className="p-1 text-gray-400 hover:text-black transition-colors"
+                    title="Edit handle"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+            <p className="text-gray-500 text-sm">{user?.email}</p>
+          </div>
         </div>
         <button
           onClick={handleSignOut}
@@ -205,13 +338,13 @@ export default function DashboardPage() {
             <h2 className="text-lg font-semibold mb-4">
               {editingBookmark ? "Edit Bookmark" : "Add New Bookmark"}
             </h2>
-            <BookmarkForm 
+            <BookmarkForm
               initialData={editingBookmark || undefined}
-              onSubmit={handleBookmarkSubmit} 
+              onSubmit={handleBookmarkSubmit}
               onCancel={editingBookmark ? handleCancelEdit : undefined}
-              isLoading={submitting} 
+              isLoading={submitting}
             />
-            
+
             {message && (
               <div
                 className={`mt-4 p-4 text-sm rounded-lg border ${
@@ -237,7 +370,9 @@ export default function DashboardPage() {
 
             {bookmarks.length === 0 ? (
               <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-xl">
-                <p className="text-gray-400">No bookmarks yet. Add your first one!</p>
+                <p className="text-gray-400">
+                  No bookmarks yet. Add your first one!
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -273,7 +408,7 @@ export default function DashboardPage() {
                       >
                         {bookmark.is_public ? "Public" : "Private"}
                       </span>
-                      
+
                       <button
                         onClick={() => handleEditClick(bookmark)}
                         className="p-1 text-gray-400 hover:text-black transition-colors"
