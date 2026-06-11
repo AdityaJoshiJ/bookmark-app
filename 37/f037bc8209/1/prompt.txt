@@ -1,0 +1,12 @@
+update dashboard page.
+
+requirements is
+
+1 fetch bookmarks for the currently authenticated user 
+2 query bookmarks table
+3 filter by current user'a user_id 
+4 display bookmark in a list below the form
+5 Show title, url, public/privet status 
+6 refresh the list after creating a bookmark 
+7 typescript 
+8 tailwind
