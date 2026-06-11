@@ -31,6 +31,13 @@ export default function SignupPage() {
         text: `${error.status ?? ""} ${error.message}`,
       });
     } else {
+      // Trigger welcome email (non-blocking)
+      fetch("/api/send-welcome-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }).catch((err) => console.error("Welcome email trigger failed:", err));
+
       setMessage({
         type: "success",
         text: "Check your email for the confirmation link!",
