@@ -1,0 +1,25 @@
+edit debugger results
+
+handleEditClick,editingBoookmark,BookmarkForm correct and useEffect is trigered with initialdata
+
+however the form inputs remain empty
+
+Plese review BookmarkForm
+
+show me
+
+1 entire formData status definition
+2 entire useEffect
+3 title input value
+4 URL input value
+5 Checkbox checked value
+
+---
+
+We found the bug
+
+console logs prove
+
+state is updating correctly
+
+plese inspect the actual JSX of title input, URL input, Chckbox, handleChange
