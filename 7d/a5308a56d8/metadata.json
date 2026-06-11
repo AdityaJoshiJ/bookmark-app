@@ -1,0 +1,21 @@
+{
+  "cli_version": "0.7.5",
+  "checkpoint_id": "7da5308a56d8",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "app/api/send-welcome-email/route.ts",
+    "app/signup/page.tsx",
+    "package-lock.json",
+    "package.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/7d/a5308a56d8/0/metadata.json",
+      "transcript": "/7d/a5308a56d8/0/full.jsonl",
+      "content_hash": "/7d/a5308a56d8/0/content_hash.txt",
+      "prompt": "/7d/a5308a56d8/0/prompt.txt"
+    }
+  ]
+}
