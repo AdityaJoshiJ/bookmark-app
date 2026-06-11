@@ -43,7 +43,7 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-4 p-6 bg-white border border-gray-200 rounded-xl shadow-sm max-w-md w-full"
+      className="space-y-4 w-full"
     >
       <div>
         <label
