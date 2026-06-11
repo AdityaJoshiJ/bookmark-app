@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [fetchingBookmarks, setFetchingBookmarks] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingBookmark, setEditingBookmark] = useState<Bookmark | null>(null);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -73,23 +74,43 @@ export default function DashboardPage() {
     setMessage(null);
 
     try {
-      const { error } = await supabase.from("bookmarks").insert({
-        user_id: user.id,
-        title: data.title,
-        url: data.url,
-        is_public: data.is_public,
-      });
+      if (editingBookmark) {
+        // Update existing bookmark
+        const { error } = await supabase
+          .from("bookmarks")
+          .update({
+            title: data.title,
+            url: data.url,
+            is_public: data.is_public,
+          })
+          .eq("id", editingBookmark.id)
+          .eq("user_id", user.id);
 
-      if (error) {
-        throw error;
+        if (error) throw error;
+
+        setMessage({
+          type: "success",
+          text: "Bookmark updated successfully!",
+        });
+      } else {
+        // Create new bookmark
+        const { error } = await supabase.from("bookmarks").insert({
+          user_id: user.id,
+          title: data.title,
+          url: data.url,
+          is_public: data.is_public,
+        });
+
+        if (error) throw error;
+
+        setMessage({
+          type: "success",
+          text: "Bookmark added successfully!",
+        });
       }
-
-      setMessage({
-        type: "success",
-        text: "Bookmark added successfully!",
-      });
       
-      // Reset form and refresh list
+      // Reset form state
+      setEditingBookmark(null);
       setFormKey(prev => prev + 1);
       fetchBookmarks(user.id);
     } catch (err) {
@@ -102,6 +123,17 @@ export default function DashboardPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleEditClick = (bookmark: Bookmark) => {
+    setEditingBookmark(bookmark);
+    setFormKey(prev => prev + 1); // Reset form with new initial data
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingBookmark(null);
+    setFormKey(prev => prev + 1);
   };
 
   const handleDeleteBookmark = async (id: string) => {
@@ -126,6 +158,11 @@ export default function DashboardPage() {
         text: "Bookmark deleted successfully!",
       });
       
+      // If we're currently editing this bookmark, cancel it
+      if (editingBookmark?.id === id) {
+        handleCancelEdit();
+      }
+
       fetchBookmarks(user.id);
     } catch (err) {
       console.error("Error deleting bookmark:", err);
@@ -164,9 +201,16 @@ export default function DashboardPage() {
 
       <div className="grid gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-6 border border-gray-200 rounded-xl shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">Add New Bookmark</h2>
-            <BookmarkForm key={formKey} onSubmit={handleBookmarkSubmit} isLoading={submitting} />
+          <div className="bg-white p-6 border border-gray-200 rounded-xl shadow-sm sticky top-8">
+            <h2 className="text-lg font-semibold mb-4">
+              {editingBookmark ? "Edit Bookmark" : "Add New Bookmark"}
+            </h2>
+            <BookmarkForm 
+              initialData={editingBookmark || undefined}
+              onSubmit={handleBookmarkSubmit} 
+              onCancel={editingBookmark ? handleCancelEdit : undefined}
+              isLoading={submitting} 
+            />
             
             {message && (
               <div
@@ -200,7 +244,11 @@ export default function DashboardPage() {
                 {bookmarks.map((bookmark) => (
                   <div
                     key={bookmark.id}
-                    className="p-4 border border-gray-100 rounded-lg hover:border-gray-200 transition-all flex justify-between items-start group"
+                    className={`p-4 border rounded-lg transition-all flex justify-between items-start group ${
+                      editingBookmark?.id === bookmark.id
+                        ? "border-black bg-gray-50 ring-1 ring-black"
+                        : "border-gray-100 hover:border-gray-200"
+                    }`}
                   >
                     <div className="overflow-hidden flex-1 mr-4">
                       <h3 className="font-semibold text-gray-900 truncate">
@@ -215,7 +263,7 @@ export default function DashboardPage() {
                         {bookmark.url}
                       </a>
                     </div>
-                    <div className="flex items-center space-x-3 shrink-0">
+                    <div className="flex items-center space-x-2 shrink-0">
                       <span
                         className={`px-2 py-1 text-xs font-medium rounded-full ${
                           bookmark.is_public
@@ -225,6 +273,28 @@ export default function DashboardPage() {
                       >
                         {bookmark.is_public ? "Public" : "Private"}
                       </span>
+                      
+                      <button
+                        onClick={() => handleEditClick(bookmark)}
+                        className="p-1 text-gray-400 hover:text-black transition-colors"
+                        title="Edit bookmark"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+
                       <button
                         onClick={() => handleDeleteBookmark(bookmark.id)}
                         disabled={deletingId === bookmark.id}

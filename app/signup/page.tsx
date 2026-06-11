@@ -13,7 +13,6 @@ export default function SignupPage() {
   } | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
-    console.log("Signup clicked");
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -27,7 +26,6 @@ export default function SignupPage() {
     });
 
     if (error) {
-      console.log("Signup error:", error);
       setMessage({
         type: "error",
         text: `${error.status ?? ""} ${error.message}`,

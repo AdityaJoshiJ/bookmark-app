@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface BookmarkFormProps {
   initialData?: {
@@ -9,12 +9,14 @@ interface BookmarkFormProps {
     is_public: boolean;
   };
   onSubmit: (data: { title: string; url: string; is_public: boolean }) => void;
+  onCancel?: () => void;
   isLoading?: boolean;
 }
 
 export const BookmarkForm: React.FC<BookmarkFormProps> = ({
   initialData,
   onSubmit,
+  onCancel,
   isLoading = false,
 }) => {
   const [formData, setFormData] = useState({
@@ -23,8 +25,17 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
     is_public: initialData?.is_public ?? false,
   });
 
+  // Ensure internal state updates when initialData changes (e.g., when clicking edit)
+  useEffect(() => {
+    setFormData({
+      title: initialData?.title || "",
+      url: initialData?.url || "",
+      is_public: initialData?.is_public ?? false,
+    });
+  }, [initialData]);
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, type } = e.target as HTMLInputElement;
     const checked = (e.target as HTMLInputElement).checked;
@@ -41,10 +52,7 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4 w-full"
-    >
+    <form onSubmit={handleSubmit} className="space-y-4 w-full">
       <div>
         <label
           htmlFor="title"
@@ -105,8 +113,23 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
         disabled={isLoading}
         className="w-full px-4 py-2 font-semibold text-white bg-black rounded-lg hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
       >
-        {isLoading ? "Saving..." : "Save Bookmark"}
+        {isLoading
+          ? "Saving..."
+          : initialData
+            ? "Update Bookmark"
+            : "Save Bookmark"}
       </button>
+
+      {onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+        >
+          Cancel
+        </button>
+      )}
     </form>
   );
 };
