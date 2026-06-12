@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 
 interface BookmarkFormProps {
   initialData?: {
@@ -25,14 +25,14 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
     is_public: initialData?.is_public ?? false,
   });
 
-  // Ensure internal state updates when initialData changes (e.g., when clicking edit)
-  useEffect(() => {
-    setFormData({
-      title: initialData?.title || "",
-      url: initialData?.url || "",
-      is_public: initialData?.is_public ?? false,
-    });
-  }, [initialData]);
+  const hasChanges = useMemo(() => {
+    if (!initialData) return true; // Always allow submission for new bookmarks
+    return (
+      formData.title !== initialData.title ||
+      formData.url !== initialData.url ||
+      formData.is_public !== initialData.is_public
+    );
+  }, [formData, initialData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -48,6 +48,7 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!hasChanges) return;
     onSubmit(formData);
   };
 
@@ -56,7 +57,7 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
       <div>
         <label
           htmlFor="title"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-semibold text-slate-700 mb-1"
         >
           Title
         </label>
@@ -68,14 +69,14 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
           onChange={handleChange}
           required
           placeholder="My Awesome Bookmark"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+          className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-black placeholder:text-slate-400"
         />
       </div>
 
       <div>
         <label
           htmlFor="url"
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-semibold text-slate-700 mb-1"
         >
           URL
         </label>
@@ -87,22 +88,22 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
           onChange={handleChange}
           required
           placeholder="https://example.com"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+          className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-black placeholder:text-slate-400"
         />
       </div>
 
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 py-1">
         <input
           id="is_public"
           name="is_public"
           type="checkbox"
           checked={formData.is_public}
           onChange={handleChange}
-          className="w-4 h-4 text-black border-gray-300 rounded focus:ring-black"
+          className="w-5 h-5 text-indigo-600 border-slate-300 rounded-lg focus:ring-indigo-500 cursor-pointer"
         />
         <label
           htmlFor="is_public"
-          className="text-sm font-medium text-gray-700"
+          className="text-sm font-semibold text-slate-700 cursor-pointer"
         >
           Make this bookmark public
         </label>
@@ -110,8 +111,8 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
 
       <button
         type="submit"
-        disabled={isLoading}
-        className="w-full px-4 py-2 font-semibold text-white bg-black rounded-lg hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        disabled={isLoading || !hasChanges}
+        className="w-full px-4 py-3 font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200"
       >
         {isLoading
           ? "Saving..."
@@ -125,7 +126,7 @@ export const BookmarkForm: React.FC<BookmarkFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className="w-full px-4 py-2 font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          className="w-full px-4 py-3 font-bold text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           Cancel
         </button>
