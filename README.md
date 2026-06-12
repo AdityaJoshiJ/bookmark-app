@@ -89,6 +89,12 @@ While building the project, I used an AI coding agent extensively and corrected 
 
 These issues were identified through testing, browser console inspection, Supabase error messages, and manual verification.
 
+
+## Known Limitations
+
+* Welcome emails are integrated using Resend. The current implementation uses a Resend testing account, which restricts email delivery to the verified email address associated with the account. Production delivery to arbitrary recipients would require a verified custom domain.
+* While setting up Entire CLI, I encountered an issue using Gemini CLI on Windows. I reproduced the issue on multiple Windows machines and created a GitHub issue documenting the problem. To complete the assignment and record agent sessions as required, I used a macOS machine where Entire CLI functioned correctly.
+
 ## Future Improvements
 
 With more time, I would add:
