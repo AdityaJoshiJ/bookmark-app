@@ -1,0 +1,497 @@
+Fix input text visibility issue.
+
+Problem:
+
+* Text typed into Email and Password fields is difficult to see.
+* Input text color appears too light.
+* Placeholder and actual input text are blending into the background.
+
+Requirements:
+
+1. Set actual input text color to:
+   text-slate-900
+
+2. Set placeholder color to:
+   placeholder:text-slate-400
+
+3. Ensure labels remain readable:
+   text-slate-700
+
+4. Apply the fix consistently to:
+
+   * Login page
+   * Signup page
+   * Any shared input styles used by auth pages
+
+5. Do not change:
+
+   * Authentication logic
+   * Validation
+   * Routing
+   * Form submission behavior
+
+6. Show the exact className changes before editing.
+
+Goal:
+Typed email and password should be clearly visible on white input backgrounds.
+
+---
+
+Form Reset Improvements
+
+Current Issues:
+
+1. Signup Page
+
+   * After successful signup, email and password fields still contain the entered values.
+
+2. Bookmark Form
+
+   * After successfully adding a bookmark, title and URL fields should reset immediately.
+
+Requirements:
+
+1. Signup Form
+
+   * After successful signup:
+
+     * Clear email field
+     * Clear password field
+     * Keep success message visible
+
+2. Bookmark Form
+
+   * After successful bookmark creation:
+
+     * Clear title field
+     * Clear URL field
+     * Reset public/private checkbox to default value
+     * Keep success message visible
+
+3. Do NOT reset fields if an error occurs.
+
+4. Do NOT change:
+
+   * Supabase logic
+   * Validation
+   * Authentication flow
+   * Edit bookmark functionality
+
+5. Use TypeScript.
+
+6. Run lint after changes.
+
+7. Show implementation plan before editing.
+
+---
+
+UI Redesign - Dashboard and Public Profile
+
+Current Problem:
+
+The dashboard and public profile pages feel unfinished and visually inconsistent with the new Login and Signup pages.
+
+Pages:
+
+* app/dashboard/page.tsx
+* app/[handle]/page.tsx
+
+Goals:
+
+Create a modern SaaS-style UI that matches the authentication pages.
+
+Requirements:
+
+1. Color System
+
+   * Primary: Indigo
+   * Secondary: Violet
+   * Success: Emerald
+   * Error: Rose
+   * Background: Slate gradient
+   * White cards
+
+2. Dashboard Layout
+
+   Header:
+
+   * App branding
+   * User handle
+   * User email
+   * Sign out button
+
+   Profile Section:
+
+   * Display handle in a premium profile card
+   * Better edit handle experience
+
+   Bookmark Form:
+
+   * Place inside its own card
+   * Consistent spacing and typography
+
+   Bookmark List:
+
+   * Modern cards
+   * Better spacing
+   * Improved edit/delete buttons
+   * Better public/private badges
+
+3. Public Profile Page
+
+   * Premium profile header
+   * Large @handle display
+   * Bookmark count
+   * Better bookmark cards
+   * Improved empty state
+
+4. Add subtle animations
+
+   * transition-all
+   * hover shadows
+   * hover lift effects
+
+5. Responsive
+
+   * Mobile
+   * Tablet
+   * Desktop
+
+6. Do NOT change:
+
+   * CRUD functionality
+   * Authentication
+   * Supabase logic
+   * RLS behavior
+   * Public profile routing
+
+7. Use only Tailwind CSS.
+
+8. Show implementation plan before editing.
+
+9. Show all files that will be modified.
+
+10. Run lint after implementation.
+
+---
+
+Debug and fix "require is not defined" error in my Next.js App Router project.
+
+Current error:
+
+ReferenceError: require is not defined
+
+Requirements:
+
+1. Find the exact source of the error.
+2. Search the entire project for:
+
+   * require(
+   * module.exports
+   * exports.
+3. Replace all CommonJS syntax with ES Module syntax.
+
+Examples:
+
+BAD:
+const x = require("package");
+
+GOOD:
+import x from "package";
+
+BAD:
+module.exports = something;
+
+GOOD:
+export default something;
+
+4. Check these files first:
+
+   * lib/supabase.ts
+   * app/api/send-welcome-email/route.ts
+   * app/[handle]/page.tsx
+   * app/dashboard/page.tsx
+   * components/*
+   * any recently modified files
+
+5. If no require() exists in source code:
+
+   * Check package imports
+   * Check dynamically imported libraries
+   * Check generated code added during UI redesign
+   * Identify which file is throwing the error
+
+6. Before editing:
+
+   * Show every file containing require(), module.exports, or exports.
+   * Explain why the error occurs.
+
+7. After fixing:
+
+   * Run npm run lint
+   * Run npm run build
+   * Confirm there are no remaining CommonJS references.
+
+8. Show all code changes before saving.
+
+---
+
+Stop searching for require().
+
+New debugging task:
+
+1. The project contains no require() calls.
+2. The error is still:
+   "ReferenceError: require is not defined"
+
+Find the ACTUAL source file causing the exception.
+
+Steps:
+
+* Run:
+  npm run build
+
+* Capture the FULL error output.
+
+* Identify the exact source file and line number.
+
+* Trace the import chain leading to that file.
+
+* Do not search for require() again unless the build output points to it.
+
+Specifically inspect:
+
+* app/[handle]/page.tsx
+* lib/supabase.ts
+* app/api/send-welcome-email/route.ts
+
+Check whether:
+
+* A client-only module is being imported into a Server Component.
+* A package is being imported incorrectly.
+* A browser-only dependency is being executed on the server.
+
+Show:
+
+1. Full build error
+2. Exact file causing it
+3. Root cause
+4. Proposed fix
+
+Do not modify files until the root cause is proven.
+
+---
+
+Implement the following UX improvements without changing any existing business logic, Supabase queries, authentication flow, or database structure.
+
+## 1. Fix Dashboard Text Visibility
+
+Problem:
+Some text on the dashboard is difficult to read because of low contrast colors.
+
+Requirements:
+
+* All input text should use text-black.
+* All input placeholders should be clearly visible but lighter than normal text.
+* Profile handle text should be highly readable.
+* Bookmark titles should use a dark color.
+* URLs should remain readable.
+* Success and error messages should maintain sufficient contrast.
+* Follow accessibility best practices for contrast.
+
+## 2. Disable Save/Update Buttons Until Changes Are Made
+
+### Bookmark Form
+
+Current behavior:
+When editing a bookmark, the "Update Bookmark" button is enabled immediately.
+
+Required behavior:
+
+* When entering edit mode, the button must be disabled.
+* Enable the button only after the user changes at least one field:
+
+  * title
+  * url
+  * is_public
+* If the user changes a value and then changes it back to the original value, disable the button again.
+* While disabled:
+
+  * show reduced opacity
+  * show not-allowed cursor
+
+Implementation:
+
+* Compare current formData with initialData.
+* Create a boolean:
+  const hasChanges = ...
+* Disable submit button when:
+  !hasChanges || isLoading
+
+### Handle Editor
+
+Current behavior:
+Save button is enabled immediately when editing a handle.
+
+Required behavior:
+
+* Save button disabled initially.
+* Enable only when handle value differs from original profile.handle.
+* Disable again if user reverts to original value.
+* Keep existing validation logic.
+
+Implementation:
+Create:
+const handleChanged = newHandle.trim() !== (profile?.handle ?? "");
+
+Use:
+disabled={!handleChanged || handleLoading}
+
+## 3. Visual Feedback
+
+For disabled buttons:
+
+* opacity-50
+* cursor-not-allowed
+
+For enabled buttons:
+
+* existing hover effects remain
+
+## 4. TypeScript
+
+Use proper TypeScript types.
+Do not use any.
+Do not introduce lint warnings.
+
+## Deliverables
+
+Show:
+
+1. Exact code changes for BookmarkForm.tsx
+2. Exact code changes for dashboard page.tsx
+3. Explanation of hasChanges logic
+4. Confirmation that create flow still works normally
+
+---
+
+Replace the native browser confirm() used for bookmark deletion with a custom React modal.
+
+Requirements:
+
+## Current Behavior
+
+Current code:
+
+```ts
+if (!confirm("Are you sure you want to delete this bookmark?")) {
+  return;
+}
+```
+
+Remove this completely.
+
+## New Behavior
+
+When user clicks the delete icon:
+
+1. Open a modal dialog.
+2. Show:
+
+   * Title: "Delete Bookmark"
+   * Message:
+     "Are you sure you want to delete this bookmark? This action cannot be undone."
+3. Show two buttons:
+
+   * Cancel
+   * Delete
+
+## Modal UX
+
+* Centered on screen
+* Dark backdrop overlay
+* Close when:
+
+  * Cancel clicked
+  * User clicks backdrop
+  * Escape key pressed
+* Responsive on mobile and desktop
+
+## Delete Flow
+
+When Delete button is clicked:
+
+1. Execute existing delete logic.
+2. Close modal.
+3. Refresh bookmark list.
+4. Show existing success/error messages.
+
+## Loading State
+
+While deleting:
+
+* Disable both buttons.
+* Change Delete button text to:
+  "Deleting..."
+* Keep existing deletingId logic.
+
+## State Management
+
+Add:
+
+```ts
+const [bookmarkToDelete, setBookmarkToDelete] =
+  useState<Bookmark | null>(null);
+```
+
+Delete icon click:
+
+```ts
+setBookmarkToDelete(bookmark);
+```
+
+Actual deletion only happens after user confirms inside modal.
+
+## Reusable Component
+
+Create:
+
+```tsx
+components/DeleteConfirmModal.tsx
+```
+
+Props:
+
+```ts
+interface DeleteConfirmModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  isLoading?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+```
+
+Use TypeScript.
+
+Do not use any external modal libraries.
+
+Use Tailwind CSS only.
+
+## Accessibility
+
+* role="dialog"
+* aria-modal="true"
+* Escape key support
+* Focus should remain inside modal while open
+
+## Deliverables
+
+Show:
+
+1. New DeleteConfirmModal component
+2. Dashboard integration changes
+3. State changes
+4. Updated delete flow
+5. Any required imports
