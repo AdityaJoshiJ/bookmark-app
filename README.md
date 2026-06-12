@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bookmark App
 
-## Getting Started
+A small personal bookmarks application built with Next.js, TypeScript, Supabase, and Resend.
 
-First, run the development server:
+Think of it as a lightweight combination of Linktree and Pocket — users can save bookmarks privately, share selected bookmarks publicly, and create a public profile using a unique handle.
+
+## Features
+
+### Authentication
+
+* Sign up with email and password
+* Log in with email and password
+* Protected dashboard for authenticated users
+* Email verification handled by Supabase
+* Welcome email sent using Resend
+
+### Bookmark Management
+
+* Create bookmarks
+* Edit bookmarks
+* Delete bookmarks
+* Mark bookmarks as public or private
+
+### Public Profiles
+
+* Unique handle for each user
+* Public profile available at `/[handle]`
+* Only public bookmarks are displayed
+* Private bookmarks remain hidden
+
+### Security
+
+* Supabase Row Level Security (RLS)
+* Users can only create, edit, view, and delete their own bookmarks
+* Public users can only view bookmarks marked as public
+
+## Tech Stack
+
+* Next.js (App Router)
+* TypeScript
+* Supabase (Authentication + Database)
+* Resend (Email)
+* Tailwind CSS
+* Vercel (Deployment)
+
+## Running Locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/AdityaJoshiJ/bookmark-app.git
+cd bookmark-app
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Create `.env.local`
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+RESEND_API_KEY=your_resend_api_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 4. Start development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Application will be available at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## AI Agent Mistakes and Corrections
 
-## Learn More
+While building the project, I used an AI coding agent extensively and corrected several issues it introduced.
 
-To learn more about Next.js, take a look at the following resources:
+* The AI generated bookmark insertion logic that failed due to missing Supabase Row Level Security policies. I investigated the `42501` permission error, created the appropriate RLS policies, and verified that users could only access their own data.
+* The AI implemented bookmark editing, but the form appeared empty when entering edit mode. After debugging state updates and component lifecycle behavior, I discovered the issue was related to UI visibility rather than state management and corrected the form behavior.
+* The AI assumed a profile row would always exist and used `.single()` when fetching profile data. This caused a `PGRST116` error when no profile record was present. I reviewed the query behavior and adjusted the implementation accordingly.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+These issues were identified through testing, browser console inspection, Supabase error messages, and manual verification.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Future Improvements
 
-## Deploy on Vercel
+With more time, I would add:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* Bookmark search and filtering
+* Bookmark categories/tags
+* Better public profile customization
+* Pagination for large bookmark collections
+* Analytics for public profile visits
+* Improved email deliverability using a custom domain and verified sender
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+The application is deployed on Vercel.
+
+Live URL:
+
+```text
+<your-vercel-url>
+```
