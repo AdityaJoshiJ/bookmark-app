@@ -107,5 +107,5 @@ The application is deployed on Vercel.
 Live URL:
 
 ```text
-<your-vercel-url>
+https://bookmark-app-sandy.vercel.app/
 ```
