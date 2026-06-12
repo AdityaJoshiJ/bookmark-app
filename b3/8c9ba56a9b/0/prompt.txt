@@ -1,0 +1,109 @@
+UI Redesign - Authentication Pages
+
+Current UI:
+
+* Very plain black and white design
+* Basic borders and buttons
+* Feels unfinished
+
+Goal:
+Create a modern SaaS-style authentication UI.
+
+Pages:
+
+* app/login/page.tsx
+* app/signup/page.tsx
+
+Requirements:
+
+1. Modern color palette:
+
+   * Primary: Indigo/Violet
+   * Secondary: Blue
+   * Success: Emerald
+   * Error: Rose
+   * Background: Slate/Gray gradient
+
+2. Layout:
+
+   * Centered authentication card
+   * Card with larger border radius
+   * Better shadow
+   * Better spacing
+
+3. Typography:
+
+   * Larger heading
+   * Better hierarchy
+   * Improved labels and helper text
+
+4. Inputs:
+
+   * Modern focus states
+   * Colored focus ring
+   * Better hover states
+
+5. Buttons:
+
+   * Gradient button
+   * Smooth hover animation
+   * Disabled state
+
+6. Add branding section:
+
+   * App name: BookmarkApp
+   * Small subtitle:
+     "Save, organize and share your favorite links"
+
+7. Responsive:
+
+   * Mobile and desktop
+
+8. Accessibility:
+
+   * Keep labels
+   * Maintain keyboard navigation
+
+9. Do NOT change:
+
+   * Authentication logic
+   * Supabase integration
+   * Validation logic
+   * Routing
+
+10. Use only Tailwind classes.
+    Do not add new UI libraries.
+
+Show implementation plan before editing files.
+
+---
+
+Implementation approved with these additions:
+
+Do not use very dark backgrounds.
+Keep:
+White cards
+Light slate backgrounds
+Indigo/Violet accents
+Add a small logo/icon above BookmarkApp.
+Use a simple bookmark icon built with SVG or Heroicons.
+Add subtle animations:
+hover
+transition-all duration-200
+hover:-translate-y-0.5 on buttons
+Improve page width:
+max-w-md for forms
+Better spacing between sections
+Keep a professional SaaS look.
+Inspiration:
+Linear
+Notion
+Vercel
+Clerk authentication pages
+Do NOT:
+Add glassmorphism
+Add neon colors
+Add dark mode
+Add particle backgrounds
+Add external UI libraries
+Preserve all existing functionality and routes.
